@@ -31,6 +31,7 @@ bot = telebot.TeleBot(config.token, threaded=False)
 #         self.name = name
 #         self.comentar = None
 #         self.time = None
+#12
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
