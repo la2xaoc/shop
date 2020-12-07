@@ -100,6 +100,34 @@ def get_brand_name(product):
         result = cursor.fetchall()
         return result[0][0]
 
+#Отримати id продукта на скидку
+def get_skidka_id(product):
+    if str(product)[0:6] != 'Скидка' and str(product) != 'Bonus':
+        sqlask = 'SELECT skidka_id FROM product WHERE product_name = \'' + str(product) + '\';'
+        cursor.execute(sqlask)
+        conn.commit()
+        result = cursor.fetchall()
+        return result[0][0]
+
+def get_name_skidka():
+    cursor.execute('SELECT * FROM name_skidka')
+    conn.commit()
+    result = cursor.fetchall()
+    for row in result:
+        config.name_list += row
+    return config.name_list
+    # for row in result:
+    #     print(row)
+
+
+def get_category_skidka():
+    sqlask = 'SELECT category FROM name_skidka'
+    cursor.execute(sqlask)
+    conn.commit()
+    result = cursor.fetchall()
+    for row in result:
+        print(row[0])
+
 
 # Отримати баланс користувача
 def getuserbalance(chid):
@@ -227,8 +255,8 @@ def get_user_count():
 # Додаємо товар в корзину
 def addbasket(userchatid, code_product):
     product_info = get_product_info_from_id(code_product)
-    sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\');".format(
-        str(userchatid), str(product_info[0]), str(product_info[1]))
+    sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count, skidka_id) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\', \'{3}\');".format(
+        str(userchatid), str(product_info[0]), str(product_info[1]), str(product_info[2]))
     cursor.execute(sqlask)
     conn.commit()
 
@@ -243,8 +271,8 @@ def rmbasket(userchatid, code_product):
         for i in range(lenasket):
             addbasket(userchatid, code_product)
             i = + 1
-        sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\');".format(
-            str(userchatid), str(product_info[0]), str(product_info[1]))
+        sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count, skidka_id) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\', \'{3}\');".format(
+            str(userchatid), str(product_info[0]), str(product_info[1]), str(product_info[2]))
         cursor.execute(sqlask)
         conn.commit()
     else:
@@ -346,7 +374,7 @@ def return_deladdbasketbonus(userchatid):
 
 # Дані про товар по коду
 def get_product_info_from_id(name):
-    sqlask = 'SELECT product_name, product_price FROM product WHERE product_name = \'' + str(name) + '\';'
+    sqlask = 'SELECT product_name, product_price, skidka_id FROM product WHERE product_name = \'' + str(name) + '\';'
     cursor.execute(sqlask)
     result = cursor.fetchall()
     conn.commit
@@ -589,8 +617,8 @@ def return_update_select_bonus(chatid):
 #             print('select_mello ' + str(result[ml][0])[0:1])
 #             if str(result[ml][0])[0:6] != 'Скидка' and str(result[ml][0] != 'Bonus'):
 #                 brand = get_brand_name(result[ml][0])
-#                 cagegoty = get_category_product_name(result[ml][0])
-#                 if brand == 'MELLO' and cagegoty == 'Подгузники':
+#                 category = get_category_product_name(result[ml][0])
+#                 if brand == 'MELLO' and category == 'Подгузники':
 #                     mello += 1
 #                 else:
 #                     continue
@@ -600,6 +628,14 @@ def return_update_select_bonus(chatid):
 #         print('select_mello select error', e)
 
 def select_mello(chatid):
+    config.name_list = []
+    cursor.execute('SELECT id FROM name_skidka')
+    conn.commit()
+    result = cursor.fetchall()
+    for row in result:
+        config.name_list += row
+
+    print("ddddddd " + str(config.name_list))
     try:
         mello = 0
         cursor.execute("SELECT product_name, product_price FROM basket WHERE chatid = " + str(chatid) + ";")
@@ -610,11 +646,14 @@ def select_mello(chatid):
         print('result ' + str(lenbasket))
         for i in range(lenbasket):
             brand = get_brand_name(result[i][0])
-            cagegoty = get_category_product_name(str(result[i][0]))
+            kod_produkta = get_skidka_id(result[i][0])
+            category = get_category_product_name(str(result[i][0]))
             print('select_brand_1 ' + str(brand))
-            print('select_cagegoty ' + str(cagegoty))
-            if brand == 'MELLO' and cagegoty == 'Подгузники':
-                mello += 1
+            print('select_category ' + str(category))
+            for k in range(len(config.name_list)):
+                print(config.name_list[k])
+                if kod_produkta == str(config.name_list[k]):
+                            mello += 1
         print('select_mello ' + str(mello))
         return mello
     except Exception as e:
