@@ -1149,11 +1149,12 @@ def add_to_money(userid):
 def add_to_money_cashback(userid):
     i = 1
     try:
-        for i in range(config.kilkist_pokupok):
-            config.cashback_bonus = dbprocessing.get_crystal_cashback_bonus()
-            dbprocessing.addToMoney_cashback(userid)
-        msg_text = 'Вам начислено cashback ' + str(config.cashback_bonus*config.kilkist_pokupok) + ' 💎.'
-        bot.send_message(chat_id=userid, text=msg_text)
+        if dbprocessing.get_crystal_cashback_bonus() != 0:
+            for i in range(config.kilkist_pokupok):
+                config.cashback_bonus = dbprocessing.get_crystal_cashback_bonus()
+                dbprocessing.addToMoney_cashback(userid)
+            msg_text = 'Вам начислено cashback ' + str(config.cashback_bonus*config.kilkist_pokupok) + ' 💎.'
+            bot.send_message(chat_id=userid, text=msg_text)
     except Exception as e:
         pass
         # print('error add cashback')
