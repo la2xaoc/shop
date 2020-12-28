@@ -850,8 +850,8 @@ def selectallprice_skidka(userchatid):
         for j in range(lencost_list):
             tmp = result[j][0]
             skidka += get_skidka(tmp)
-        ren = ren - skidka  # Від Загальної суми скидки віднімаємо один раз скидку яка не повторюється
-        return ren
+        ren1 = ren - skidka  # Від Загальної суми скидки віднімаємо один раз скидку яка не повторюється
+        return ren1
     except:
         return 0
 
