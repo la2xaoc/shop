@@ -110,24 +110,10 @@ def get_skidka_id(product):
         result = cursor.fetchall()
         return result[0][0]
 
-def get_name_skidka():
-    cursor.execute('SELECT * FROM name_skidka')
-    conn.commit()
-    result = cursor.fetchall()
-    for row in result:
-        config.name_list += row
-    return config.name_list
-    # for row in result:
-    #     print(row)
 
 
-def get_category_skidka():
-    sqlask = 'SELECT category FROM name_skidka'
-    cursor.execute(sqlask)
-    conn.commit()
-    result = cursor.fetchall()
-    for row in result:
-        print(row[0])
+
+
 
 
 # Отримати баланс користувача
@@ -663,14 +649,6 @@ def return_update_select_bonus(chatid):
 
 
 def select_mello(chatid):
-    config.name_list = []
-    cursor.execute('SELECT id FROM name_skidka')
-    conn.commit()
-    result = cursor.fetchall()
-    for row in result:
-        config.name_list += row
-
-    print("ddddddd " + str(config.name_list))
     try:
         mello = 0
         cursor.execute("SELECT product_name, product_price FROM basket WHERE chatid = " + str(chatid) + ";")
@@ -822,7 +800,7 @@ def selectallprice1(userchatid):
 
 
 def get_skidka(skidka_id):
-    sqlask = 'SELECT skidka_price FROM name_skidka WHERE id = \'{0}\''.format(skidka_id)
+    sqlask = 'SELECT skidka_price FROM product WHERE product_id = \'{0}\''.format(skidka_id)
     cursor.execute(sqlask)
     conn.commit()
     result = cursor.fetchall()
@@ -832,26 +810,31 @@ def get_skidka(skidka_id):
 def selectallprice_skidka(userchatid):
     skidka = 0
     ren = 0
-
-    #sqlask = 'SELECT skidka_price FROM basket WHERE chatid = \'{0}\' and skidka_price > 0'.format(userchatid)
-    sqlask = 'SELECT skidka_id FROM basket WHERE chatid = \'{0}\' and skidka_id > 0'.format(userchatid)
-    cursor.execute(sqlask)
-    conn.commit()
-    result = cursor.fetchall()
-
-    lenbasket = len(result)         # кількість skidka_id
-    cost_list = list(set(result))   # Видаляє дублікати skidka_id
-    lencost_list = len(cost_list)   # кількість skidka_id які не повторюються
     try:
+        #sqlask = 'SELECT skidka_price FROM basket WHERE chatid = \'{0}\' and skidka_price > 0'.format(userchatid)
+        sqlask = 'SELECT skidka_id FROM basket WHERE chatid = \'{0}\' and skidka_price > 0'.format(userchatid)
+        cursor.execute(sqlask)
+        conn.commit()
+        result = cursor.fetchall()
+
+        lenbasket = len(result)         # кількість skidka_id
+        cost_list = list(set(result))   # Видаляє дублікати skidka_id
+        #print("cost_list " + str(cost_list))
+        lencost_list = len(cost_list)   # кількість skidka_id які не повторюються
+        #print("lencost_list " + str(lencost_list))
+
         for i in range(lenbasket):
             tmp = result[i][0]
             ren += get_skidka(tmp)  # Загальна сума скидки
-
         for j in range(lencost_list):
-            tmp = result[j][0]
-            skidka += get_skidka(tmp)
-        ren1 = ren - skidka  # Від Загальної суми скидки віднімаємо один раз скидку яка не повторюється
-        return ren1
+            #print("j = " + str(j))
+            tmp1 = cost_list[j][0]
+            #print("tmp1 = " + str(tmp1))
+            skidka1 = get_skidka(tmp1)
+            #print("skidka1 = " + str(skidka1))
+            skidka += skidka1
+        ren = ren - skidka  # Від Загальної суми скидки віднімаємо один раз скидку яка не повторюється
+        return ren
     except:
         return 0
 

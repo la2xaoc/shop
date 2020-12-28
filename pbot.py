@@ -19,8 +19,7 @@ import sys
 dbprocessing.get_bonus()
 dbprocessing.get_bonus_status()
 # logging.basicConfig(level=logging.DEBUG)
-print(dbprocessing.get_name_skidka())
-#print(dbprocessing.get_category_skidka())
+
 
 bot = telebot.TeleBot(config.token, threaded=False)
 #dbprocessing.select_admin1()
