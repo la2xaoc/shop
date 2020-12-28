@@ -415,6 +415,7 @@ def create_order_onestep(message):
     global chat_id1
     try:
         chat_id1 = message.chat.id
+        dbprocessing.selectallprice_skidka(chat_id1)
         config.kilkist_pokupok = dbprocessing.get_count(chat_id1)
         msg_id = message.message_id
         msg_id1 = message.message_id
@@ -1099,8 +1100,11 @@ def send_user_status(text, status):
 def back_user_bonus(text):
     get_user_id = text.split('user_id: ')
     user_id = get_user_id[1]
+    print("user_id = get_user_id[1] " + str(user_id))
     tmp = user_id.split()
+    print("tmp = user_id.split() " + str(tmp))
     tmp_1 = tmp[0]
+    print("tmp_1 = tmp[0]) " + str(tmp_1))
     return tmp_1
 
 

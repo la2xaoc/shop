@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 import config
+from collections import Counter
 #import mysql.connector
 # conn = sqlite3.connect("store.db")
 # cursor = conn.cursor()
@@ -255,8 +256,8 @@ def get_user_count():
 # Додаємо товар в корзину
 def addbasket(userchatid, code_product):
     product_info = get_product_info_from_id(code_product)
-    sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count, skidka_id) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\', \'{3}\');".format(
-        str(userchatid), str(product_info[0]), str(product_info[1]), str(product_info[2]))
+    sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count, skidka_id, skidka_price) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\', \'{3}\', \'{4}\');".format(
+        str(userchatid), str(product_info[0]), str(product_info[1]), str(product_info[2]), str(product_info[3]))
     cursor.execute(sqlask)
     conn.commit()
 
@@ -271,8 +272,8 @@ def rmbasket(userchatid, code_product):
         for i in range(lenasket):
             addbasket(userchatid, code_product)
             i = + 1
-        sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count, skidka_id) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\', \'{3}\');".format(
-            str(userchatid), str(product_info[0]), str(product_info[1]), str(product_info[2]))
+        sqlask = "INSERT INTO basket(chatid, product_name, product_price, product_count, skidka_id, skidka_price) VALUES (\'{0}\', \'{1}\', \'{2}\', \'1\', \'{3}\', \'{4}\');".format(
+            str(userchatid), str(product_info[0]), str(product_info[1]), str(product_info[2]), str(product_info[3]))
         cursor.execute(sqlask)
         conn.commit()
     else:
@@ -374,7 +375,7 @@ def return_deladdbasketbonus(userchatid):
 
 # Дані про товар по коду
 def get_product_info_from_id(name):
-    sqlask = 'SELECT product_name, product_price, skidka_id FROM product WHERE product_name = \'' + str(name) + '\';'
+    sqlask = 'SELECT product_name, product_price, skidka_id, skidka_price FROM product WHERE product_name = \'' + str(name) + '\';'
     cursor.execute(sqlask)
     result = cursor.fetchall()
     conn.commit
@@ -627,6 +628,40 @@ def return_update_select_bonus(chatid):
 #     except Exception as e:
 #         print('select_mello select error', e)
 
+# def select_mello(chatid):
+#     config.name_list = []
+#     cursor.execute('SELECT id FROM name_skidka')
+#     conn.commit()
+#     result = cursor.fetchall()
+#     for row in result:
+#         config.name_list += row
+#
+#     print("ddddddd " + str(config.name_list))
+#     try:
+#         mello = 0
+#         cursor.execute("SELECT product_name, product_price FROM basket WHERE chatid = " + str(chatid) + ";")
+#         conn.commit()
+#         result = cursor.fetchall()
+#         lenbasket = len(result)
+#         print('result ' + str(result))
+#         print('result ' + str(lenbasket))
+#         for i in range(lenbasket):
+#             brand = get_brand_name(result[i][0])
+#             kod_produkta = get_skidka_id(result[i][0])
+#             category = get_category_product_name(str(result[i][0]))
+#             print('select_brand_1 ' + str(brand))
+#             print('select_category ' + str(category))
+#             for k in range(len(config.name_list)):
+#                 print(config.name_list[k])
+#                 if kod_produkta == str(config.name_list[k]):
+#                             mello += 1
+#         print('select_mello ' + str(mello))
+#         return mello
+#     except Exception as e:
+#         print('select_mello select error', e)
+
+
+
 def select_mello(chatid):
     config.name_list = []
     cursor.execute('SELECT id FROM name_skidka')
@@ -650,6 +685,7 @@ def select_mello(chatid):
             category = get_category_product_name(str(result[i][0]))
             print('select_brand_1 ' + str(brand))
             print('select_category ' + str(category))
+            print('config.name_list ' + str(config.name_list))
             for k in range(len(config.name_list)):
                 print(config.name_list[k])
                 if kod_produkta == str(config.name_list[k]):
@@ -658,6 +694,7 @@ def select_mello(chatid):
         return mello
     except Exception as e:
         print('select_mello select error', e)
+
 
 def add_basket_bonus(userid, product_name, product_price):
     print(userid, product_name, product_price)
@@ -744,7 +781,80 @@ def selectallprice1(userchatid):
     return allprice
 
 
+# # Отримуємо загальну Сумму СКИДКИ товарів в корзині Всего -
+# def selectallprice_skidka(userchatid):
+#     allprice = 0
+#     cost_list = []
+#     ren = 0
+#     res = 0
+#     sqlask = 'SELECT skidka_price FROM basket WHERE chatid = \'{0}\' and skidka_price > 0'.format(userchatid)
+#     cursor.execute(sqlask)
+#     conn.commit()
+#     result = cursor.fetchall()
+#     lenbasket = len(result)
+#     cost_list = [200, 100]
+#     lencost_list = len(cost_list)
+#     try:
+#         for i in range(lenbasket):
+#             ren += result[i][0]
+#             i += 1
+#         for j in range(lencost_list):
+#             ren = ren - cost_list[j]
+#         return ren
+#         #print('selectallprice_skidka ' + str(ren))
+#     except:
+#         return 0
+
+
+    # lenbasket = len(result)
+    # for i in range(lenbasket):
+    #     allprice = allprice + float(result[i][0])
+    #     i += 1
+    # bonusprice = basket_bonus_all(userchatid)
+    # basket_b = basket_bonus(userchatid)
+    # allprice = allprice - bonusprice - basket_b
+    # return allprice
+
 # Отримуємо загальну ціну товарів в корзині Всего -
+
+
+# Отримуємо загальну Сумму СКИДКИ товарів в корзині Всего -
+
+
+def get_skidka(skidka_id):
+    sqlask = 'SELECT skidka_price FROM name_skidka WHERE id = \'{0}\''.format(skidka_id)
+    cursor.execute(sqlask)
+    conn.commit()
+    result = cursor.fetchall()
+    return result[0][0]
+
+
+def selectallprice_skidka(userchatid):
+    skidka = 0
+    ren = 0
+
+    #sqlask = 'SELECT skidka_price FROM basket WHERE chatid = \'{0}\' and skidka_price > 0'.format(userchatid)
+    sqlask = 'SELECT skidka_id FROM basket WHERE chatid = \'{0}\' and skidka_id > 0'.format(userchatid)
+    cursor.execute(sqlask)
+    conn.commit()
+    result = cursor.fetchall()
+
+    lenbasket = len(result)         # кількість skidka_id
+    cost_list = list(set(result))   # Видаляє дублікати skidka_id
+    lencost_list = len(cost_list)   # кількість skidka_id які не повторюються
+    try:
+        for i in range(lenbasket):
+            tmp = result[i][0]
+            ren += get_skidka(tmp)  # Загальна сума скидки
+
+        for j in range(lencost_list):
+            tmp = result[j][0]
+            skidka += get_skidka(tmp)
+        ren = ren - skidka  # Від Загальної суми скидки віднімаємо один раз скидку яка не повторюється
+        return ren
+    except:
+        return 0
+
 def selectallprice(userchatid):
     allprice = 0
     cursor.execute("SELECT product_price FROM basket WHERE chatid = " + str(userchatid) + ";")
@@ -755,6 +865,7 @@ def selectallprice(userchatid):
         allprice = allprice + float(result[i][0])
         i += 1
     bonusprice = float(basket_bonus_all(userchatid))
+    #bonusprice = float(selectallprice_skidka(userchatid))  # Загальна сума скидки
     basket_b = float(basket_bonus(userchatid))
     if bonusprice:
         allprice = allprice - bonusprice - basket_b
@@ -775,16 +886,17 @@ def selectallprice(userchatid):
 
 # Отримуємо загальну ціну скидки в корзині Всего -
 def basket_bonus_all(userchatid):
-    allprice = 0
-    i = 0
-    cursor.execute("SELECT product_price FROM basket_skidka WHERE chatid = " + str(userchatid) + ";")
-    conn.commit()
-    result = cursor.fetchall()
-    lenbasket = len(result)
-    for i in range(lenbasket):
-        allprice = allprice + float(result[i][0])
-        i += 1
-    return allprice
+    # allprice = 0
+    # i = 0
+    # cursor.execute("SELECT product_price FROM basket_skidka WHERE chatid = " + str(userchatid) + ";")
+    # conn.commit()
+    # result = cursor.fetchall()
+    # lenbasket = len(result)
+    # for i in range(lenbasket):
+    #     allprice = allprice + float(result[i][0])
+    #     i += 1
+    allprice1 = selectallprice_skidka(userchatid)
+    return allprice1
 
 # Отримуємо загальну ціну бонусів в корзині Всего -
 def basket_bonus(userchatid):

@@ -17,6 +17,7 @@ cashback_bonus = 0
 user_id = 0
 id_o = 0
 mello = 0
+tmp_200 = 0
 item_list = []
 name_list = []
 am_elevent = ['11:00 - 16:00', '16:00-20:00']
